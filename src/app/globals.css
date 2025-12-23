@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #3B0D5A;       /* Ungu gelap, background utama */
+  --color-brand-medium: #6C2CA7; /* Ungu medium, aksen planet */
+  --color-brand-light: #8C63C9;  /* Ungu terang, aksen lembut/secondary */
+  --color-white-purple: #EDE5FF; /* Putih yang lebih padu dengan ungu */
+}
+
+body {
+  @apply bg-[var(--color-brand)] text-[var(--color-white-purple)];
+}
