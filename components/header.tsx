@@ -1,16 +1,33 @@
-// Header.tsx (paste replace bagian Header lama)
+// Header.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Moon, Sun, User, Search, ShoppingBag } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useCart } from "@/store/cartStore";
 
 export default function Header() {
   const { darkMode, toggleTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
+  const { getTotalItems } = useCart();
+  const [cartCount, setCartCount] = useState(0);
+
+  // Hydration-safe cart count
+  useEffect(() => {
+    setCartCount(getTotalItems());
+  }, [getTotalItems]);
+
+  // Subscribe to cart changes
+  useEffect(() => {
+    const unsubscribe = useCart.subscribe(() => {
+      setCartCount(useCart.getState().getTotalItems());
+    });
+    return unsubscribe;
+  }, []);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -18,7 +35,6 @@ export default function Header() {
     { name: "Bookmark", href: "/Bookmark" },
   ];
 
-  // helper untuk menandai active
   const isActive = (href: string) => pathname === href;
 
   return (
@@ -37,10 +53,9 @@ export default function Header() {
           <span className={`${darkMode ? "text-white" : "text-gray-900"} font-semibold hidden sm:inline`}>Centurion</span>
         </div>
 
-        {/* CENTER: nav + search (centred) */}
+        {/* CENTER: nav + search */}
         <div className="flex-1 flex justify-center">
           <div className="flex items-center gap-8">
-            {/* Nav links */}
             <nav className="hidden sm:flex items-center gap-6">
               {navLinks.map((link) => (
                 <Link
@@ -48,18 +63,17 @@ export default function Header() {
                   href={link.href}
                   className={`text-sm font-medium transition-all duration-200
                       ${isActive(link.href)
-                        ? darkMode ? "text-yellow-400" : "text-purple-700"
-                        : darkMode ? "text-white/90 hover:text-white" : "text-gray-800 hover:text-gray-900"}`}
+                      ? darkMode ? "text-yellow-400" : "text-purple-700"
+                      : darkMode ? "text-white/90 hover:text-white" : "text-gray-800 hover:text-gray-900"}`}
                 >
                   {link.name}
                 </Link>
               ))}
             </nav>
 
-            {/* Search box - tetap di tengah bersama nav */}
             <div className={`flex items-center rounded-full px-3 py-1 border transition-all duration-200
                              ${darkMode ? "bg-white/6 border-white/10" : "bg-white/70 border-gray-200"}`}
-                 style={{ minWidth: 240, maxWidth: 420 }}>
+              style={{ minWidth: 240, maxWidth: 420 }}>
               <Search size={16} className={`${darkMode ? "text-white/90" : "text-gray-600"} mr-2`} />
               <input
                 type="text"
@@ -73,7 +87,6 @@ export default function Header() {
 
         {/* RIGHT: actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Theme toggle */}
           <button
             aria-label="Toggle theme"
             onClick={toggleTheme}
@@ -82,18 +95,19 @@ export default function Header() {
             {darkMode ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-purple-700" />}
           </button>
 
-          {/* Cart / Shopping Bag */}
           <button
             aria-label="Cart"
-            onClick={() => router.push("/cart")}
+            onClick={() => router.push("/checkout")}
             className={`relative p-2 rounded-lg transition-transform duration-200 hover:scale-110 ${darkMode ? "text-white hover:bg-white/10" : "text-black hover:bg-gray-200/60"}`}
           >
             <ShoppingBag size={18} />
-            {/* badge: ganti angka sesuai state */}
-            <span className="absolute -top-1 -right-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-yellow-400 text-black">3</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-yellow-400 text-black">
+                {cartCount}
+              </span>
+            )}
           </button>
 
-          {/* User */}
           <button
             aria-label="User profile"
             onClick={() => router.push("/profile")}

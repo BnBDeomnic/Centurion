@@ -1,7 +1,7 @@
 // components/Hero.tsx
 "use client";
 import React from "react";
-import Image from "next/image";
+import Link from "next/link";
 import { useTheme } from "../context/ThemeContext";
 import { Search } from "lucide-react";
 import BookCard from "./card";
@@ -83,12 +83,12 @@ export default function Hero() {
               Jelajahi Koleksi
             </button>
 
-            <a
+            <Link
               href="/popular"
               className={`px-4 py-2 rounded-2xl text-sm font-medium transition-transform duration-150 ${darkMode ? "bg-white/6 text-white hover:bg-white/10" : "bg-white ring-1 ring-yellow-200 text-gray-800 hover:brightness-98"}`}
             >
               Lihat Populer
-            </a>
+            </Link>
 
             <span className={`ml-2 text-sm ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
               atau coba filter kategori di bawah
@@ -119,9 +119,9 @@ export default function Hero() {
               <button className={`flex-1 text-sm py-2 rounded-md font-medium ${darkMode ? "bg-yellow-400 text-black" : "bg-purple-700 text-white"}`}>
                 Beli Sekarang
               </button>
-              <a href="/book/atomic-habits" className={`text-sm px-3 py-2 rounded-md ${darkMode ? "bg-white/6 text-white" : "bg-white ring-1 ring-yellow-100 text-gray-800"}`}>
+              <Link href="/book/atomic-habits" className={`text-sm px-3 py-2 rounded-md ${darkMode ? "bg-white/6 text-white" : "bg-white ring-1 ring-yellow-100 text-gray-800"}`}>
                 Detail
-              </a>
+              </Link>
             </div>
           </div>
         </div>
