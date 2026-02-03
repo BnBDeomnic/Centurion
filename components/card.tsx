@@ -100,18 +100,40 @@ export default function BookCard({
       onClick={() => setFlipped(!flipped)}
       style={{ perspective: 1000 }}
     >
-      {/* Bookmark button - shows on hover */}
-      <button
+      {/* Bookmark button - shows on hover with animations */}
+      <motion.button
         onClick={handleBookmark}
         disabled={bookmarkLoading}
-        className={`absolute top-2 right-2 z-20 p-2 rounded-full transition-all ${bookmarkLoading ? "opacity-50" : ""
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
+        animate={isBookmarkedState ? {
+          scale: [1, 1.3, 1],
+          rotate: [0, -10, 10, 0]
+        } : {}}
+        transition={{ duration: 0.3 }}
+        className={`absolute top-2 right-2 z-20 p-2 rounded-full transition-all duration-300 ${bookmarkLoading ? "opacity-50 cursor-wait" : "cursor-pointer"
           } ${isBookmarkedState
-            ? "bg-pink-500 text-white opacity-100"
-            : "bg-black/50 text-white opacity-0 group-hover:opacity-100"
+            ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white opacity-100 shadow-lg shadow-pink-500/40"
+            : "bg-black/50 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 hover:bg-black/70"
           }`}
       >
-        <Heart size={16} fill={isBookmarkedState ? "currentColor" : "none"} />
-      </button>
+        <motion.div
+          animate={isBookmarkedState ? {
+            scale: [1, 1.2, 1]
+          } : {}}
+          transition={{
+            duration: 0.6,
+            repeat: isBookmarkedState ? 2 : 0,
+            repeatType: "reverse"
+          }}
+        >
+          <Heart
+            size={16}
+            fill={isBookmarkedState ? "currentColor" : "none"}
+            className={isBookmarkedState ? "drop-shadow-md" : ""}
+          />
+        </motion.div>
+      </motion.button>
 
       {/* Card wrapper */}
       <motion.div
