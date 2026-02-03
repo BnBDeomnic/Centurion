@@ -14,14 +14,13 @@ export default function Page() {
   return (
     <div
       className={`flex flex-col min-h-screen transition-colors duration-500
-        ${
-          darkMode
-            ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
-            : "bg-gradient-to-t from-white to-yellow-200 text-gray-900"
+        ${darkMode
+          ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
+          : "bg-gradient-to-t from-white to-yellow-200 text-gray-900"
         }`}
     >
       <Header />
-      <main className="flex-grow px-6 md:px-8 lg:px-12 py-12 pt-28">
+      <main className="flex-grow px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 pt-24 sm:pt-28">
         <div className="container mx-auto space-y-12">
           <div className="w-full">
             <Swiper />

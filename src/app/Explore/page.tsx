@@ -186,11 +186,11 @@ export default function ExplorePage() {
     >
       <Header />
 
-      <main className="flex-grow px-4 md:px-8 lg:px-12 py-8 pt-28">
+      <main className="flex-grow px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 pt-24 sm:pt-28">
         <div className="container mx-auto max-w-7xl">
 
           {/* Hero Search Section */}
-          <section className={`rounded-3xl p-8 md:p-12 mb-12 ${darkMode
+          <section className={`rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-12 mb-8 sm:mb-12 ${darkMode
             ? "bg-gradient-to-r from-purple-900/50 to-pink-900/30 border border-purple-500/20"
             : "bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-200"
             }`}>

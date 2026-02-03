@@ -40,7 +40,7 @@ export default function Footer() {
       </div>
 
       {/* Footer Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-8 md:pt-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-20 pb-6 sm:pt-24 sm:pb-8 md:pt-32">
         {/* Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
           {/* Kolom 1: Brand & Tagline */}
