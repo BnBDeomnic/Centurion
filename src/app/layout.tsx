@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "../../context/ThemeContext";
+import { AuthProvider } from "../../context/AuthContext";
 import type { ReactNode } from "react";
 import Script from "next/script";
 
@@ -36,9 +37,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Script>
       </head>
       <body>
-        {/* IMPORTANT: Wrap children with ThemeProvider so useTheme() works */}
-        <ThemeProvider>{children}</ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+

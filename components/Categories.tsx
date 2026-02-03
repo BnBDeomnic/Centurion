@@ -1,97 +1,48 @@
 // components/Categories.tsx
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import BookCard from "./card";
 import { motion } from "framer-motion";
+import { getBooksBySubject } from "@/lib/openLibrary";
+import type { Book } from "@/types/book";
 
-type Category = { id: string; label: string; icon?: string };
-type Book = {
-  id: string;
-  title: string;
-  author: string;
-  image: string;
-  badge?: string;
-  synopsis?: string;
-  categories: string[]; // list kategori book belongs to
-};
+type Category = { id: string; label: string; icon?: string; subject: string };
 
 const CATEGORIES: Category[] = [
-  { id: "all", label: "Semua", icon: "📚" },
-  { id: "fiction", label: "Fiksi", icon: "📖" },
-  { id: "nonfiction", label: "Non-Fiksi", icon: "📚" },
-  { id: "sci", label: "Sains", icon: "🔬" },
-  { id: "business", label: "Bisnis", icon: "💼" },
-  { id: "self", label: "Pengembangan Diri", icon: "🌱" },
-  { id: "kids", label: "Anak", icon: "🧸" },
-];
-
-// contoh data buku (ganti path image sesuai /public/books/* atau URL)
-const BOOKS: Book[] = [
-  {
-    id: "b1",
-    title: "Atomic Habits",
-    author: "James Clear",
-    image: "/cover_buku/atomic habits.jpg",
-    badge: "Best Seller",
-    synopsis: "Prinsip perubahan kecil yang menghasilkan hasil luar biasa.",
-    categories: ["self", "business"],
-  },
-  {
-    id: "b2",
-    title: "Sapiens",
-    author: "Yuval Noah Harari",
-    image: "/cover_buku/sapiens.jpg",
-    badge: "Top Pick",
-    synopsis: "Sejarah singkat umat manusia dari masa ke masa.",
-    categories: ["nonfiction", "sci"],
-  },
-  {
-    id: "b3",
-    title: "The Lean Startup",
-    author: "Eric Ries",
-    image: "/cover_buku/The_Lean_Startup.jpg",
-    badge: "Populer",
-    synopsis: "Metode validasi produk dan startup yang efisien.",
-    categories: ["business", "nonfiction"],
-  },
-  {
-    id: "b4",
-    title: "Deep Work",
-    author: "Cal Newport",
-    image: "/cover_buku/deepwork.jpg",
-    badge: "Recommended",
-    synopsis: "Cara kerja fokus dalam era distraksi.",
-    categories: ["self", "nonfiction"],
-  },
-  {
-    id: "b5",
-    title: "Harry Potter",
-    author: "J.K. Rowling",
-    image: "/cover_buku/harrypotter.jpg",
-    badge: "Favorit",
-    synopsis: "Petualangan si penyihir muda di Hogwarts.",
-    categories: ["fiction", "kids"],
-  },
-  {
-    id: "b6",
-    title: "Little Explorers",
-    author: "A. Penulis",
-    image: "/cover_buku/littleexplorer.jpg",
-    badge: "Anak",
-    synopsis: "Buku edukatif untuk anak usia dini.",
-    categories: ["kids", "nonfiction"],
-  },
+  { id: "all", label: "Semua", icon: "📚", subject: "bestseller" },
+  { id: "fiction", label: "Fiksi", icon: "📖", subject: "fiction" },
+  { id: "nonfiction", label: "Non-Fiksi", icon: "📚", subject: "nonfiction" },
+  { id: "sci", label: "Sains", icon: "🔬", subject: "science" },
+  { id: "business", label: "Bisnis", icon: "💼", subject: "business" },
+  { id: "self", label: "Pengembangan Diri", icon: "🌱", subject: "self_help" },
+  { id: "kids", label: "Anak", icon: "🧸", subject: "children" },
 ];
 
 export default function Categories() {
   const { darkMode } = useTheme();
   const [selected, setSelected] = useState<string>("all");
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // filter buku berdasarkan kategori yang dipilih
-  const filtered = useMemo(() => {
-    if (selected === "all") return BOOKS;
-    return BOOKS.filter((b) => b.categories.includes(selected));
+  // Fetch books when category changes
+  useEffect(() => {
+    async function fetchBooks() {
+      setLoading(true);
+      const category = CATEGORIES.find((c) => c.id === selected);
+      const subject = category?.subject || "bestseller";
+
+      try {
+        const data = await getBooksBySubject(subject, 8);
+        setBooks(data);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+        setBooks([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBooks();
   }, [selected]);
 
   return (
@@ -117,8 +68,8 @@ export default function Categories() {
                     ? "bg-purple-600 text-white ring-1 ring-purple-400/30"
                     : "bg-yellow-300 text-gray-900 ring-1 ring-yellow-400/40"
                   : darkMode
-                  ? "bg-white/4 text-white/90 ring-1 ring-white/6 hover:bg-white/6"
-                  : "bg-white text-gray-800 ring-1 ring-yellow-100 hover:brightness-98"
+                    ? "bg-white/4 text-white/90 ring-1 ring-white/6 hover:bg-white/6"
+                    : "bg-white text-gray-800 ring-1 ring-yellow-100 hover:brightness-98"
                 }`}
               aria-pressed={active}
               aria-label={`Filter ${c.label}`}
@@ -134,29 +85,44 @@ export default function Categories() {
       <div className="mt-6">
         <div className="flex items-center justify-between mb-4">
           <p className={`text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-            Menampilkan <span className="font-semibold">{filtered.length}</span> buku{" "}
-            {selected !== "all" && (
+            {loading ? (
+              "Memuat..."
+            ) : (
               <>
-                untuk kategori <span className="font-semibold">{CATEGORIES.find(c => c.id === selected)?.label}</span>
+                Menampilkan <span className="font-semibold">{books.length}</span> buku{" "}
+                {selected !== "all" && (
+                  <>
+                    untuk kategori <span className="font-semibold">{CATEGORIES.find(c => c.id === selected)?.label}</span>
+                  </>
+                )}
               </>
             )}
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {filtered.map((b) => (
-            <div key={b.id} className="w-full">
-              <BookCard
-                title={b.title}
-                author={b.author}
-                image={b.image}
-                badge={b.badge}
-                synopsis={b.synopsis}
+          {loading ? (
+            // Skeleton loading
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className={`aspect-[3/4] rounded-xl animate-pulse ${darkMode ? "bg-white/10" : "bg-gray-200"}`}
               />
-            </div>
-          ))}
-
-          {filtered.length === 0 && (
+            ))
+          ) : books.length > 0 ? (
+            books.map((book) => (
+              <div key={book.id} className="w-full">
+                <BookCard
+                  id={book.id}
+                  title={book.title}
+                  author={book.author}
+                  image={book.image || book.coverUrl || "/cover_buku/default.jpg"}
+                  synopsis={book.synopsis || book.description}
+                  price={book.price}
+                />
+              </div>
+            ))
+          ) : (
             <div className={`col-span-full p-6 rounded-lg ${darkMode ? "bg-white/4 text-white/90" : "bg-white text-gray-700"}`}>
               Tidak ada buku pada kategori ini.
             </div>
@@ -166,3 +132,4 @@ export default function Categories() {
     </section>
   );
 }
+

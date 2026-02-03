@@ -93,7 +93,7 @@ function BookCarousel({
                 id={book.id}
                 title={book.title}
                 author={book.author}
-                image={book.coverUrl || "/cover_buku/default.jpg"}
+                image={book.image || "/cover_buku/default.jpg"}
                 synopsis={book.description}
                 price={book.price}
               />
@@ -212,6 +212,12 @@ export default function ExplorePage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleSearch(e as unknown as React.FormEvent);
+                      }
+                    }}
                     placeholder="Cari judul, penulis, atau topik..."
                     className={`flex-1 bg-transparent outline-none ${darkMode ? "text-white placeholder-gray-400" : "text-gray-900 placeholder-gray-500"
                       }`}
@@ -294,7 +300,7 @@ export default function ExplorePage() {
                       id={book.id}
                       title={book.title}
                       author={book.author}
-                      image={book.coverUrl || "/cover_buku/default.jpg"}
+                      image={book.image || "/cover_buku/default.jpg"}
                       synopsis={book.description}
                       price={book.price}
                     />

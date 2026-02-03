@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, ShoppingCart, Heart, Share2 } from "lucide-react";
 import { useTheme } from "../../../../context/ThemeContext";
+import { useAuth } from "../../../../context/AuthContext";
 import { getBookByWorkId } from "@/lib/openLibrary";
 import { useCart } from "@/store/cartStore";
+import { useBookmarks } from "@/store/bookmarkStore";
 import type { Book } from "@/types/book";
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
@@ -15,10 +17,14 @@ export default function BookDetailPage() {
     const { id } = useParams();
     const router = useRouter();
     const { darkMode } = useTheme();
+    const { user } = useAuth();
     const { addItem } = useCart();
+    const { bookmarks, addBookmark, removeBookmark, isBookmarked, fetchBookmarks } = useBookmarks();
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
     const [added, setAdded] = useState(false);
+    const [bookmarkLoading, setBookmarkLoading] = useState(false);
+    const hasFetchedBookmarks = useRef(false);
 
     useEffect(() => {
         async function fetchBook() {
@@ -31,12 +37,36 @@ export default function BookDetailPage() {
         fetchBook();
     }, [id]);
 
+    // Fetch bookmarks when user is authenticated
+    useEffect(() => {
+        if (user && !hasFetchedBookmarks.current) {
+            hasFetchedBookmarks.current = true;
+            fetchBookmarks();
+        }
+    }, [user, fetchBookmarks]);
+
     const handleAddToCart = () => {
         if (book) {
             addItem(book);
             setAdded(true);
             setTimeout(() => setAdded(false), 2000);
         }
+    };
+
+    const handleToggleBookmark = async () => {
+        if (!user) {
+            router.push("/login");
+            return;
+        }
+        if (!book) return;
+
+        setBookmarkLoading(true);
+        if (isBookmarked(book.id)) {
+            await removeBookmark(book.id);
+        } else {
+            await addBookmark(book);
+        }
+        setBookmarkLoading(false);
     };
 
     const formatPrice = (price: number) => {
@@ -82,8 +112,8 @@ export default function BookDetailPage() {
     return (
         <div
             className={`min-h-screen transition-colors duration-300 ${darkMode
-                    ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
-                    : "bg-gradient-to-t from-white to-yellow-100 text-gray-900"
+                ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
+                : "bg-gradient-to-t from-white to-yellow-100 text-gray-900"
                 }`}
         >
             <Header />
@@ -93,8 +123,8 @@ export default function BookDetailPage() {
                 <button
                     onClick={() => router.back()}
                     className={`flex items-center gap-2 mb-6 px-4 py-2 rounded-lg transition-all ${darkMode
-                            ? "bg-white/10 hover:bg-white/20 text-white"
-                            : "bg-white hover:bg-gray-100 text-gray-800 shadow-sm"
+                        ? "bg-white/10 hover:bg-white/20 text-white"
+                        : "bg-white hover:bg-gray-100 text-gray-800 shadow-sm"
                         }`}
                 >
                     <ArrowLeft size={18} />
@@ -128,8 +158,8 @@ export default function BookDetailPage() {
                                     <span
                                         key={idx}
                                         className={`px-3 py-1 text-xs rounded-full ${darkMode
-                                                ? "bg-purple-600/30 text-purple-200"
-                                                : "bg-yellow-200 text-yellow-800"
+                                            ? "bg-purple-600/30 text-purple-200"
+                                            : "bg-yellow-200 text-yellow-800"
                                             }`}
                                     >
                                         {cat}
@@ -177,10 +207,10 @@ export default function BookDetailPage() {
                             <button
                                 onClick={handleAddToCart}
                                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${added
-                                        ? "bg-green-500 text-white"
-                                        : darkMode
-                                            ? "bg-yellow-400 text-black hover:bg-yellow-300"
-                                            : "bg-purple-700 text-white hover:bg-purple-600"
+                                    ? "bg-green-500 text-white"
+                                    : darkMode
+                                        ? "bg-yellow-400 text-black hover:bg-yellow-300"
+                                        : "bg-purple-700 text-white hover:bg-purple-600"
                                     }`}
                             >
                                 <ShoppingCart size={20} />
@@ -188,18 +218,22 @@ export default function BookDetailPage() {
                             </button>
 
                             <button
-                                className={`p-3 rounded-xl transition-all ${darkMode
+                                onClick={handleToggleBookmark}
+                                disabled={bookmarkLoading}
+                                className={`p-3 rounded-xl transition-all ${bookmarkLoading ? "opacity-50" : ""} ${book && isBookmarked(book.id)
+                                    ? "bg-pink-500 text-white"
+                                    : darkMode
                                         ? "bg-white/10 text-white hover:bg-white/20"
                                         : "bg-white text-gray-800 hover:bg-gray-100 shadow-sm"
                                     }`}
                             >
-                                <Heart size={20} />
+                                <Heart size={20} fill={book && isBookmarked(book.id) ? "currentColor" : "none"} />
                             </button>
 
                             <button
                                 className={`p-3 rounded-xl transition-all ${darkMode
-                                        ? "bg-white/10 text-white hover:bg-white/20"
-                                        : "bg-white text-gray-800 hover:bg-gray-100 shadow-sm"
+                                    ? "bg-white/10 text-white hover:bg-white/20"
+                                    : "bg-white text-gray-800 hover:bg-gray-100 shadow-sm"
                                     }`}
                             >
                                 <Share2 size={20} />
@@ -213,8 +247,8 @@ export default function BookDetailPage() {
                                 router.push("/checkout");
                             }}
                             className={`w-full mt-4 py-3 rounded-xl font-semibold transition-all ${darkMode
-                                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90"
-                                    : "bg-gradient-to-r from-yellow-400 to-orange-400 text-black hover:opacity-90"
+                                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90"
+                                : "bg-gradient-to-r from-yellow-400 to-orange-400 text-black hover:opacity-90"
                                 }`}
                         >
                             Beli Sekarang

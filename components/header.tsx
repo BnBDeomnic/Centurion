@@ -1,20 +1,26 @@
 // Header.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Moon, Sun, User, Search, ShoppingBag } from "lucide-react";
+import { Moon, Sun, User, Search, ShoppingBag, Bookmark, LogOut, ChevronDown } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useCart } from "@/store/cartStore";
+import { useAuth } from "../context/AuthContext";
+import { useBookmarks } from "@/store/bookmarkStore";
 
 export default function Header() {
   const { darkMode, toggleTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
   const { getTotalItems } = useCart();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const { bookmarks, fetchBookmarks } = useBookmarks();
   const [cartCount, setCartCount] = useState(0);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const hasFetchedBookmarks = useRef(false);
 
   // Hydration-safe cart count
   useEffect(() => {
@@ -29,13 +35,27 @@ export default function Header() {
     return unsubscribe;
   }, []);
 
+  // Fetch bookmarks when user is authenticated
+  useEffect(() => {
+    if (user && !hasFetchedBookmarks.current) {
+      hasFetchedBookmarks.current = true;
+      fetchBookmarks();
+    }
+  }, [user, fetchBookmarks]);
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Explore", href: "/Explore" },
-    { name: "Bookmark", href: "/Bookmark" },
+    { name: "Bookmark", href: "/bookmarks" },
   ];
 
   const isActive = (href: string) => pathname === href;
+
+  const handleSignOut = async () => {
+    await signOut();
+    setShowUserMenu(false);
+    router.push("/");
+  };
 
   return (
     <header
@@ -95,6 +115,21 @@ export default function Header() {
             {darkMode ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-purple-700" />}
           </button>
 
+          {/* Bookmark */}
+          <button
+            aria-label="Bookmarks"
+            onClick={() => router.push("/bookmarks")}
+            className={`relative p-2 rounded-lg transition-transform duration-200 hover:scale-110 ${darkMode ? "text-white hover:bg-white/10" : "text-black hover:bg-gray-200/60"}`}
+          >
+            <Bookmark size={18} />
+            {bookmarks.length > 0 && (
+              <span className="absolute -top-1 -right-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-pink-500 text-white">
+                {bookmarks.length}
+              </span>
+            )}
+          </button>
+
+          {/* Cart */}
           <button
             aria-label="Cart"
             onClick={() => router.push("/checkout")}
@@ -108,15 +143,64 @@ export default function Header() {
             )}
           </button>
 
-          <button
-            aria-label="User profile"
-            onClick={() => router.push("/profile")}
-            className={`p-2 rounded-lg transition-transform duration-200 hover:scale-110 ${darkMode ? "text-white hover:bg-white/10" : "text-black hover:bg-gray-200/60"}`}
-          >
-            <User size={18} />
-          </button>
+          {/* User / Auth */}
+          {authLoading ? (
+            <div className="w-8 h-8 animate-pulse rounded-lg bg-white/10" />
+          ) : user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className={`flex items-center gap-1 p-2 rounded-lg transition-all ${darkMode ? "text-white hover:bg-white/10" : "text-black hover:bg-gray-200/60"}`}
+              >
+                <User size={18} />
+                <ChevronDown size={14} className={`transition-transform ${showUserMenu ? "rotate-180" : ""}`} />
+              </button>
+
+              {showUserMenu && (
+                <div
+                  className={`absolute right-0 top-full mt-2 w-48 rounded-xl overflow-hidden shadow-lg border ${darkMode ? "bg-gray-900 border-white/10" : "bg-white border-gray-200"
+                    }`}
+                >
+                  <div className={`px-4 py-3 border-b ${darkMode ? "border-white/10" : "border-gray-100"}`}>
+                    <p className="text-sm font-medium truncate">{user.user_metadata?.name || "User"}</p>
+                    <p className={`text-xs truncate ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                      {user.email}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm text-left transition-colors ${darkMode ? "hover:bg-white/5 text-red-400" : "hover:bg-gray-50 text-red-600"
+                      }`}
+                  >
+                    <LogOut size={16} />
+                    Keluar
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-all ${darkMode ? "text-white hover:bg-white/10" : "text-gray-800 hover:bg-gray-200/60"
+                  }`}
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/register"
+                className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-all ${darkMode
+                  ? "bg-yellow-400 text-black hover:bg-yellow-300"
+                  : "bg-purple-700 text-white hover:bg-purple-600"
+                  }`}
+              >
+                Daftar
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
   );
 }
+
