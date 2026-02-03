@@ -5,22 +5,34 @@ import { createContext, useContext, ReactNode, useState, useEffect } from "react
 type ThemeContextType = {
   darkMode: boolean;
   toggleTheme: () => void;
+  mounted: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
   darkMode: false,
-  toggleTheme: () => {},
+  toggleTheme: () => { },
+  mounted: false,
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+  // Always start with false to match server render
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [mounted, setMounted] = useState(false);
 
-    // BACA DARI CLASS HTML (hasil inline script)
-    return document.documentElement.classList.contains("dark");
-  });
+  // Read actual theme from localStorage after mount (client-side only)
+  useEffect(() => {
+    const saved = localStorage.getItem("darkMode");
+    if (saved === "true") {
+      setDarkMode(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     localStorage.setItem("darkMode", String(darkMode));
 
     if (darkMode) {
@@ -28,15 +40,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [darkMode]);
+  }, [darkMode, mounted]);
 
   const toggleTheme = () => setDarkMode((prev) => !prev);
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ darkMode, toggleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
 export const useTheme = () => useContext(ThemeContext);
+
