@@ -154,9 +154,9 @@
 
 This project is deployed on **Vercel**.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/BnBDeomnic/Centurion)
+🚀 **Live Demo:** [https://centurion-wt8v.vercel.app/](https://centurion-wt8v.vercel.app/)
 
-> ⚠️ Remember to add environment variables in Vercel Dashboard → Settings → Environment Variables
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/BnBDeomnic/Centurion)
 
 ---
 
