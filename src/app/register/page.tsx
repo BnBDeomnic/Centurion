@@ -53,8 +53,8 @@ export default function RegisterPage() {
         return (
             <div
                 className={`min-h-screen flex items-center justify-center px-4 ${darkMode
-                        ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
-                        : "bg-gradient-to-t from-white to-yellow-100 text-gray-900"
+                    ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
+                    : "bg-gradient-to-t from-white to-yellow-100 text-gray-900"
                     }`}
             >
                 <div
@@ -71,8 +71,8 @@ export default function RegisterPage() {
                     <Link
                         href="/login"
                         className={`inline-block px-6 py-3 rounded-xl font-semibold ${darkMode
-                                ? "bg-yellow-400 text-black hover:bg-yellow-300"
-                                : "bg-purple-700 text-white hover:bg-purple-600"
+                            ? "bg-yellow-400 text-black hover:bg-yellow-300"
+                            : "bg-purple-700 text-white hover:bg-purple-600"
                             }`}
                     >
                         Ke Halaman Login
@@ -85,8 +85,8 @@ export default function RegisterPage() {
     return (
         <div
             className={`min-h-screen flex items-center justify-center px-4 py-8 ${darkMode
-                    ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
-                    : "bg-gradient-to-t from-white to-yellow-100 text-gray-900"
+                ? "bg-gradient-to-b from-gray-900 via-[#2C034A] to-[#4B1C6B] text-white"
+                : "bg-gradient-to-t from-white to-yellow-100 text-gray-900"
                 }`}
         >
             <div
@@ -95,7 +95,7 @@ export default function RegisterPage() {
             >
                 {/* Back button */}
                 <button
-                    onClick={() => router.back()}
+                    onClick={() => router.push("/")}
                     className={`flex items-center gap-2 mb-6 text-sm ${darkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"
                         }`}
                 >
@@ -136,8 +136,8 @@ export default function RegisterPage() {
                                 placeholder="Nama lengkap"
                                 required
                                 className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all ${darkMode
-                                        ? "bg-white/5 border-white/10 focus:border-purple-500"
-                                        : "bg-gray-50 border-gray-200 focus:border-purple-500"
+                                    ? "bg-white/5 border-white/10 focus:border-purple-500"
+                                    : "bg-gray-50 border-gray-200 focus:border-purple-500"
                                     } outline-none`}
                             />
                         </div>
@@ -159,8 +159,8 @@ export default function RegisterPage() {
                                 placeholder="nama@email.com"
                                 required
                                 className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all ${darkMode
-                                        ? "bg-white/5 border-white/10 focus:border-purple-500"
-                                        : "bg-gray-50 border-gray-200 focus:border-purple-500"
+                                    ? "bg-white/5 border-white/10 focus:border-purple-500"
+                                    : "bg-gray-50 border-gray-200 focus:border-purple-500"
                                     } outline-none`}
                             />
                         </div>
@@ -182,8 +182,8 @@ export default function RegisterPage() {
                                 placeholder="Minimal 6 karakter"
                                 required
                                 className={`w-full pl-10 pr-12 py-3 rounded-xl border transition-all ${darkMode
-                                        ? "bg-white/5 border-white/10 focus:border-purple-500"
-                                        : "bg-gray-50 border-gray-200 focus:border-purple-500"
+                                    ? "bg-white/5 border-white/10 focus:border-purple-500"
+                                    : "bg-gray-50 border-gray-200 focus:border-purple-500"
                                     } outline-none`}
                             />
                             <button
@@ -213,8 +213,8 @@ export default function RegisterPage() {
                                 placeholder="Ulangi password"
                                 required
                                 className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all ${darkMode
-                                        ? "bg-white/5 border-white/10 focus:border-purple-500"
-                                        : "bg-gray-50 border-gray-200 focus:border-purple-500"
+                                    ? "bg-white/5 border-white/10 focus:border-purple-500"
+                                    : "bg-gray-50 border-gray-200 focus:border-purple-500"
                                     } outline-none`}
                             />
                         </div>
